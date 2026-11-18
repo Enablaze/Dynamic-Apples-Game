@@ -66,3 +66,21 @@ vcpkg_installed/
 # test output & cache
 Testing/
 .cache/
+
+# Visual Studio
+.vs/
+x64/
+Win32/
+[Dd]ebug/
+[Rr]elease/
+*.user
+*.aps
+*.ipch
+*.VC.db
+
+# Prebuilt SFML 2.5.1 is part of the repo on purpose: the solution builds
+# right after cloning, with nothing to install.
+!SFML/**/*.lib
+!SFML/**/*.pdb
+# openal32.dll must sit next to the exe for sound to work.
+!EBLZ_ApplesGame_Dynamic/openal32.dll
