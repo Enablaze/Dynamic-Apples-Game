@@ -31,8 +31,21 @@ namespace DynamicApplesGame
 	// Apple settings:
 	const int MIN_APPLES = 5;
 	const int MAX_APPLES = 25;
+	const int NUM_APPLES_SMALL = 20;
+	const int NUM_APPLES_LARGE = 50;
 	const float APPLE_SIZE = 20.0f;
 	const float HALF_APPLE = APPLE_SIZE / 2.f;
+
+	const unsigned int MODE_ACCELERATION = 1u << 0;		// player speed+ with apple eat
+	const unsigned int MODE_FINITE_APPLES = 1u << 1;	// game ends when all apples are eaten
+	const unsigned int MODE_MANY_APPLES = 1u << 2;		// LARGE apples instead of SMALL apples
+	const unsigned int MODE_RANDOM_APPLES = 1u << 3;	// override MANY_APPLES mode
+
+	const unsigned int MODE_PRESET_20_ACCELERATION = MODE_ACCELERATION;
+	const unsigned int MODE_PRESET_20_CONSTANT = 0u;
+	const unsigned int MODE_PRESET_50_ACCELERATION = MODE_ACCELERATION | MODE_MANY_APPLES;
+
+	const unsigned int DEFAULT_GAME_MODE = MODE_FINITE_APPLES | MODE_ACCELERATION;
 
 	// Stones settings:
 	const int NUM_STONES = 4;

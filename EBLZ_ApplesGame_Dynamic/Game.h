@@ -29,6 +29,7 @@ namespace DynamicApplesGame
 		Stone stones[NUM_STONES];
 		Projectile projectiles[MAX_PROJECTILES];
 		MenuItems menuItemSelection = MenuItems::ResumeGame;
+		unsigned int gameModeMask = DEFAULT_GAME_MODE;
 
 		float throwCooldownLeft = 0.f;
 		float untilRestartTimeLeft = 0.f;

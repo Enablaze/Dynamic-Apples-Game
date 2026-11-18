@@ -20,5 +20,6 @@ namespace DynamicApplesGame
 	void RestartApple(Apple& apple)
 	{
 		apple.position = GetRandomPositionInRect(APPLE_SIZE, { FIELD_LEFT, FIELD_TOP }, { FIELD_WIDTH, FIELD_HEIGHT });
+		apple.isEaten = false;
 	}
 }

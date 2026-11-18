@@ -3,6 +3,11 @@
 
 namespace DynamicApplesGame
 {
+	bool IsModeOn(unsigned int modeMask, unsigned int modeBit)
+	{
+		return (modeMask & modeBit) != 0;
+	}
+
 	void MoveMenuSelection(Game& game, int direction)
 	{
 		int newSelection = static_cast<int>(game.menuItemSelection) + direction;
@@ -97,7 +102,18 @@ namespace DynamicApplesGame
 
 		InitPlayer(game.player, game.resources.playerTexture);
 
-		game.numApples = MIN_APPLES + (rand() % (MAX_APPLES - MIN_APPLES + 1));
+		if (IsModeOn(game.gameModeMask, MODE_RANDOM_APPLES))		// first check priority
+		{
+			game.numApples = MIN_APPLES + (rand() % (MAX_APPLES - MIN_APPLES + 1));
+		}
+		else if (IsModeOn(game.gameModeMask, MODE_MANY_APPLES))
+		{
+			game.numApples = NUM_APPLES_LARGE;
+		}
+		else
+		{
+			game.numApples = NUM_APPLES_SMALL;
+		}
 		game.apples = new Apple[game.numApples];
 
 		for (int i = 0; i < game.numApples; ++i)
@@ -230,6 +246,14 @@ namespace DynamicApplesGame
 		}
 	}
 
+	void EndRound(Game& game)
+	{
+		game.state = GameState::GameOver;
+		game.isGameLive = false;
+		game.untilRestartTimeLeft = GAME_OVER_STOP_TIME;
+		UpdateGameOverFade(game.ui, 0.f);
+	}
+
 	void UpdatePlayingState(Game& game, float deltaTime)
 	{
 		// Player input movement.
@@ -256,10 +280,7 @@ namespace DynamicApplesGame
 
 		if (IsPlayerCollideWithWallOrActor(game))
 		{
-			game.state = GameState::GameOver;
-			game.isGameLive = false;
-			game.untilRestartTimeLeft = GAME_OVER_STOP_TIME;
-			UpdateGameOverFade(game.ui, 0.f);
+			EndRound(game);
 			game.resources.deathSound.play();
 			return;
 		}
@@ -267,7 +288,13 @@ namespace DynamicApplesGame
 		// Eat apples, score, speed, respawn, stones
 		for (int i = 0; i < game.numApples; ++i)
 		{
-			if (IsCirclesCollide(game.player.position, HALF_PLAYER, game.apples[i].position, HALF_APPLE))
+			Apple& apple = game.apples[i];
+			if (apple.isEaten)
+			{
+				continue; // finite mode
+			}
+
+			if (IsCirclesCollide(game.player.position, HALF_PLAYER, apple.position, HALF_APPLE))
 			{
 				++game.numEatenApples;
 
@@ -278,10 +305,26 @@ namespace DynamicApplesGame
 
 				game.resources.eatSound.play();
 
-				IncreasePlayerSpeed(game.player);
+				if (IsModeOn(game.gameModeMask, MODE_ACCELERATION))
+				{
+					IncreasePlayerSpeed(game.player);
+				}
 
-				RestartApple(game.apples[i]);
+				if (IsModeOn(game.gameModeMask, MODE_FINITE_APPLES))
+				{
+					apple.isEaten = true;
+				}
+				else
+				{
+					RestartApple(apple);
+				}
 			}
+		}
+
+		if (IsModeOn(game.gameModeMask, MODE_FINITE_APPLES) && game.numEatenApples >= game.numApples)
+		{
+			EndRound(game);
+			return;
 		}
 
 		for (int i = 0; i < MAX_PROJECTILES; ++i)
@@ -359,7 +402,10 @@ namespace DynamicApplesGame
 		// Draw apples
 		for (int i = 0; i < game.numApples; ++i)
 		{
-			DrawApple(game.apples[i], window);
+			if (!game.apples[i].isEaten) // finite mode
+			{
+				DrawApple(game.apples[i], window);
+			}
 		}
 
 		// Draw stones

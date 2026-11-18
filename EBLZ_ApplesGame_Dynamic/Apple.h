@@ -8,6 +8,7 @@ namespace DynamicApplesGame
 	{
 		Position2D position;
 		sf::Sprite sprite;
+		bool isEaten = false; // finite mode only.
 	};
 
 	void InitApple(Apple& apple, const sf::Texture& texture);
