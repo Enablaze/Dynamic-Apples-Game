@@ -24,7 +24,8 @@ namespace DynamicApplesGame
 
 		GameState state = GameState::Playing;
 		Player player;
-		Apple apples[NUM_APPLES];
+		Apple* apples = nullptr; // apples in heap, num is know at start. InitGame - DeinitGame.
+		int numApples = 0;
 		Stone stones[NUM_STONES];
 		Projectile projectiles[MAX_PROJECTILES];
 		MenuItems menuItemSelection = MenuItems::ResumeGame;

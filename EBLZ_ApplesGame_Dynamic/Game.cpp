@@ -54,7 +54,7 @@ namespace DynamicApplesGame
 	{
 		RestartPlayer(game.player);
 
-		for (int i = 0; i < NUM_APPLES; ++i)
+		for (int i = 0; i < game.numApples; ++i)
 		{
 			RestartApple(game.apples[i]);
 		}
@@ -97,7 +97,10 @@ namespace DynamicApplesGame
 
 		InitPlayer(game.player, game.resources.playerTexture);
 
-		for (int i = 0; i < NUM_APPLES; ++i)
+		game.numApples = MIN_APPLES + (rand() % (MAX_APPLES - MIN_APPLES + 1));
+		game.apples = new Apple[game.numApples];
+
+		for (int i = 0; i < game.numApples; ++i)
 		{
 			InitApple(game.apples[i], game.resources.appleTexture);
 		}
@@ -262,7 +265,7 @@ namespace DynamicApplesGame
 		}
 
 		// Eat apples, score, speed, respawn, stones
-		for (int i = 0; i < NUM_APPLES; ++i)
+		for (int i = 0; i < game.numApples; ++i)
 		{
 			if (IsCirclesCollide(game.player.position, HALF_PLAYER, game.apples[i].position, HALF_APPLE))
 			{
@@ -354,7 +357,7 @@ namespace DynamicApplesGame
 		DrawBackground(game.ui, window);
 
 		// Draw apples
-		for (int i = 0; i < NUM_APPLES; ++i)
+		for (int i = 0; i < game.numApples; ++i)
 		{
 			DrawApple(game.apples[i], window);
 		}
@@ -396,8 +399,10 @@ namespace DynamicApplesGame
 		window.display();
 	}
 
-	void DeinitGame(Game&)
+	void DeinitGame(Game& game)
 	{
-		
+		delete[] game.apples;
+		game.apples = nullptr;
+		game.numApples = 0;
 	}
 }

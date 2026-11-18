@@ -29,7 +29,8 @@ namespace DynamicApplesGame
 	const float HALF_PLAYER = PLAYER_SIZE / 2.f;
 
 	// Apple settings:
-	const int NUM_APPLES = 10;
+	const int MIN_APPLES = 5;
+	const int MAX_APPLES = 25;
 	const float APPLE_SIZE = 20.0f;
 	const float HALF_APPLE = APPLE_SIZE / 2.f;
 
