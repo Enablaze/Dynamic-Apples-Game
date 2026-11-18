@@ -47,6 +47,15 @@ namespace DynamicApplesGame
 
 	const unsigned int DEFAULT_GAME_MODE = MODE_FINITE_APPLES | MODE_ACCELERATION;
 
+	const int NUM_MODE_OPTIONS = 4;
+	const unsigned int MODE_OPTION_BITS[NUM_MODE_OPTIONS] = 
+	{ 
+		MODE_ACCELERATION,
+		MODE_FINITE_APPLES,
+		MODE_MANY_APPLES,
+		MODE_RANDOM_APPLES 
+	};
+
 	// Stones settings:
 	const int NUM_STONES = 4;
 	const float STONE_SIZE = 30.f;

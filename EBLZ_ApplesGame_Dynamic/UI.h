@@ -1,5 +1,6 @@
 #pragma once
 #include <SFML/Graphics.hpp>
+#include "Constants.h"
 
 namespace DynamicApplesGame
 {
@@ -11,6 +12,9 @@ namespace DynamicApplesGame
 	};
 
 	const int NUM_MENU_ITEMS = 3;
+	const int MODE_MENU_START_INDEX = NUM_MODE_OPTIONS;
+	const int MODE_MENU_BACK_INDEX = NUM_MODE_OPTIONS + 1;
+	const int NUM_MODE_MENU_ITEMS = NUM_MODE_OPTIONS + 2;
 
 	struct UI
 	{
@@ -22,6 +26,7 @@ namespace DynamicApplesGame
 		sf::Text gameOverText;
 		sf::Text menuHintText;
 		sf::Text menuItemTexts[NUM_MENU_ITEMS];
+		sf::Text modeMenuTexts[NUM_MODE_MENU_ITEMS];
 	};
 
 	void UpdateMenuItems(UI& ui, bool isResumeAvailable, MenuItems selectedItem);
@@ -43,4 +48,8 @@ namespace DynamicApplesGame
 	void UpdateGameOverFade(UI& ui, float alphaProgress);
 
 	void DrawHUD(const UI& ui, sf::RenderWindow& window);
+
+	void UpdateModeMenu(UI& ui, unsigned int modeMask, int selectedIndex);
+
+	void DrawModeMenu(const UI& ui, sf::RenderWindow& window);
 }

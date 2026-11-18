@@ -23,6 +23,11 @@ namespace DynamicApplesGame
 	const float MENU_LINE_HEIGHT = 50.f;
 	const char* const MENU_ITEM_STRINGS[NUM_MENU_ITEMS] = { "Continue", "New game", "Exit" };
 
+	const char* const MODE_OPTION_STRINGS[NUM_MODE_OPTIONS] = { "Acceleration", "Finite apples", "50 apples", "Random count" };
+	const char* const MODE_MENU_START_STRING = "Start";
+	const char* const MODE_MENU_BACK_STRING = "Back";
+
+
 	const unsigned int MENU_HINT_FONT_SIZE = 18;
 	const float MENU_HINT_RIGHT_MARGIN = 60.f;
 	const sf::Color MENU_HINT_COLOR(150, 150, 150);
@@ -40,7 +45,10 @@ namespace DynamicApplesGame
 		"\n"
 		"In Menu:\n"
 		"Up / Down - Choose\n"
-		"Enter - Select";
+		"Enter - Select\n"
+		"1-4 - Toggle mode\n"
+		"Esc - Back";
+
 
 	void SetupText(sf::Text& text, const sf::Font& font, unsigned int size, const sf::Color& color, const sf::Vector2f& position)
 	{
@@ -87,6 +95,14 @@ namespace DynamicApplesGame
 			SetupText(ui.menuItemTexts[i], font, MENU_FONT_SIZE, sf::Color::White, position);
 			ui.menuItemTexts[i].setString(MENU_ITEM_STRINGS[i]);
 		}
+
+		for (int i = 0; i < NUM_MODE_MENU_ITEMS; ++i)
+		{
+			const sf::Vector2f position = { MENU_TEXT_LEFT, MENU_TEXT_TOP + i * MENU_LINE_HEIGHT };
+			SetupText(ui.modeMenuTexts[i], font, MENU_FONT_SIZE, MENU_ITEM_COLOR, position);
+		}
+		ui.modeMenuTexts[MODE_MENU_START_INDEX].setString(MODE_MENU_START_STRING);
+		ui.modeMenuTexts[MODE_MENU_BACK_INDEX].setString(MODE_MENU_BACK_STRING);
 
 		ui.gameOverText.setString("GAME OVER");
 
@@ -146,6 +162,31 @@ namespace DynamicApplesGame
 		for (int i = 0; i < NUM_MENU_ITEMS; ++i)
 		{
 			window.draw(ui.menuItemTexts[i]);
+		}
+
+		window.draw(ui.menuHintText);
+	}
+
+	void UpdateModeMenu(UI& ui, unsigned int modeMask, int selectedIndex)
+	{
+		for (int i = 0; i < NUM_MODE_OPTIONS; ++i)
+		{
+			const bool isOn = (modeMask & MODE_OPTION_BITS[i]) != 0;
+			const std::string row = std::to_string(i + 1) + ". " + MODE_OPTION_STRINGS[i] + (isOn ? "  [x]" : "  [ ]");
+			ui.modeMenuTexts[i].setString(row);
+		}
+
+		for (int i = 0; i < NUM_MODE_MENU_ITEMS; ++i)
+		{
+			ui.modeMenuTexts[i].setFillColor(i == selectedIndex ? MENU_ACTIVE_ITEM_COLOR : MENU_ITEM_COLOR);
+		}
+	}
+
+	void DrawModeMenu(const UI& ui, sf::RenderWindow& window)
+	{
+		for (int i = 0; i < NUM_MODE_MENU_ITEMS; ++i)
+		{
+			window.draw(ui.modeMenuTexts[i]);
 		}
 
 		window.draw(ui.menuHintText);

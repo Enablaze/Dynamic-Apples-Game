@@ -14,7 +14,8 @@ namespace DynamicApplesGame
 	{
 		Playing,
 		GameOver,
-		Menu
+		Menu,
+		ModeSelect
 	};
 
 	struct Game
@@ -30,6 +31,9 @@ namespace DynamicApplesGame
 		Projectile projectiles[MAX_PROJECTILES];
 		MenuItems menuItemSelection = MenuItems::ResumeGame;
 		unsigned int gameModeMask = DEFAULT_GAME_MODE;
+		unsigned int pendingModeMask = DEFAULT_GAME_MODE;
+		int modeMenuSelection = MODE_MENU_START_INDEX;
+
 
 		float throwCooldownLeft = 0.f;
 		float untilRestartTimeLeft = 0.f;

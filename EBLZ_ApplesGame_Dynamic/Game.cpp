@@ -55,8 +55,34 @@ namespace DynamicApplesGame
 		}
 	}
 
+	void RecreateApples(Game& game)
+	{
+		delete[] game.apples;
+
+		if (IsModeOn(game.gameModeMask, MODE_RANDOM_APPLES))
+		{
+			game.numApples = MIN_APPLES + (rand() % (MAX_APPLES - MIN_APPLES + 1));
+		}
+		else if (IsModeOn(game.gameModeMask, MODE_MANY_APPLES))
+		{
+			game.numApples = NUM_APPLES_LARGE;
+		}
+		else
+		{
+			game.numApples = NUM_APPLES_SMALL;
+		}
+		game.apples = new Apple[game.numApples];
+
+		for (int i = 0; i < game.numApples; ++i)
+		{
+			InitApple(game.apples[i], game.resources.appleTexture);
+		}
+	}
+
 	void StartNewRound(Game& game)
 	{
+		RecreateApples(game);
+
 		RestartPlayer(game.player);
 
 		for (int i = 0; i < game.numApples; ++i)
@@ -94,6 +120,13 @@ namespace DynamicApplesGame
 		game.state = GameState::Menu;
 	}
 
+	void EnterModeSelect(Game& game)
+	{
+		game.pendingModeMask = game.gameModeMask;
+		game.modeMenuSelection = MODE_MENU_START_INDEX;
+		game.state = GameState::ModeSelect;
+	}
+
 	void InitGame(Game& game)
 	{
 		LoadResources(game.resources);
@@ -101,25 +134,6 @@ namespace DynamicApplesGame
 		InitUI(game.ui, game.resources.uiFont);
 
 		InitPlayer(game.player, game.resources.playerTexture);
-
-		if (IsModeOn(game.gameModeMask, MODE_RANDOM_APPLES))		// first check priority
-		{
-			game.numApples = MIN_APPLES + (rand() % (MAX_APPLES - MIN_APPLES + 1));
-		}
-		else if (IsModeOn(game.gameModeMask, MODE_MANY_APPLES))
-		{
-			game.numApples = NUM_APPLES_LARGE;
-		}
-		else
-		{
-			game.numApples = NUM_APPLES_SMALL;
-		}
-		game.apples = new Apple[game.numApples];
-
-		for (int i = 0; i < game.numApples; ++i)
-		{
-			InitApple(game.apples[i], game.resources.appleTexture);
-		}
 
 		for (int i = 0; i < NUM_STONES; ++i)
 		{
@@ -166,7 +180,7 @@ namespace DynamicApplesGame
 					game.state = GameState::Playing;
 					break;
 				case MenuItems::NewGame:
-					StartNewRound(game);
+					EnterModeSelect(game);
 					break;
 				case MenuItems::QuitGame:
 					game.exitRequested = true;
@@ -180,6 +194,42 @@ namespace DynamicApplesGame
 			else if (event.key.code == sf::Keyboard::Down)
 			{
 				MoveMenuSelection(game, 1);
+			}
+			break;
+
+		case GameState::ModeSelect:
+			if (event.key.code == sf::Keyboard::Escape)
+			{
+				EnterMenu(game);
+			}
+			else if (event.key.code >= sf::Keyboard::Num1 && event.key.code < sf::Keyboard::Num1 + NUM_MODE_OPTIONS)
+			{
+				const int option = event.key.code - sf::Keyboard::Num1;
+				game.pendingModeMask ^= MODE_OPTION_BITS[option];
+			}
+			else if (event.key.code == sf::Keyboard::Up)
+			{
+				game.modeMenuSelection = (game.modeMenuSelection - 1 + NUM_MODE_MENU_ITEMS) % NUM_MODE_MENU_ITEMS;
+			}
+			else if (event.key.code == sf::Keyboard::Down)
+			{
+				game.modeMenuSelection = (game.modeMenuSelection + 1) % NUM_MODE_MENU_ITEMS;
+			}
+			else if (event.key.code == sf::Keyboard::Enter)
+			{
+				if (game.modeMenuSelection < NUM_MODE_OPTIONS)
+				{
+					game.pendingModeMask ^= MODE_OPTION_BITS[game.modeMenuSelection];
+				}
+				else if (game.modeMenuSelection == MODE_MENU_START_INDEX)
+				{
+					game.gameModeMask = game.pendingModeMask;
+					StartNewRound(game);
+				}
+				else if (game.modeMenuSelection == MODE_MENU_BACK_INDEX)
+				{
+					EnterMenu(game);
+				}
 			}
 			break;
 
@@ -381,11 +431,17 @@ namespace DynamicApplesGame
 
 			UpdateGameOverState(game, deltaTime);
 			break;
-			
+
 		case GameState::Menu:
 
 			UpdateMenuOverlay(game.ui, game.isGameLive);
 			UpdateMenuItems(game.ui, game.isGameLive, game.menuItemSelection);
+			break;
+
+		case GameState::ModeSelect:
+
+			UpdateMenuOverlay(game.ui, game.isGameLive);
+			UpdateModeMenu(game.ui, game.pendingModeMask, game.modeMenuSelection);
 			break;
 		}
 
@@ -440,6 +496,11 @@ namespace DynamicApplesGame
 		if (game.state == GameState::Menu)
 		{
 			DrawMenu(game.ui, window);
+		}
+
+		if (game.state == GameState::ModeSelect)
+		{
+			DrawModeMenu(game.ui, window);
 		}
 
 		window.display();
